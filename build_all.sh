@@ -3,7 +3,7 @@
 set -e
 
 # choose local directory where packages will be installed
-if [ -z "$TESTRELDIR" ]; then
+if [ -z "$TESTRELDIR" ]; then # check that the TESTRELDIR variable is not null if it is null then set the directory to that path of where you executed the script.
   export INSTDIR=`pwd`/install
 else
   export INSTDIR="$TESTRELDIR"
@@ -18,7 +18,14 @@ no_ana=0
 no_shmem=0
 build_ext_list=""
 
-while getopts "c:p:s:b:fdam" opt; do
+# Above we assigned variables and values as defaults. However, we allow a user to pass in values to said variables.
+# The way this loop works is getopts in a bash function that parses the positional arguments from the command line. 
+# we say "expect options c p s b fdam". What does this mean? getopts has two parameters: options and arguments. I am 
+# saying that "c p s b fdam" are the command line options to expect values for: build_all.sh -c arg -p arg2 etc. We do not
+# even need to use them all. We only use what we want. This case, which is like a if/else, says case $opt in ..., where $opt is 
+# one of the options c p s b fdam. Loop through, if my loop is at option "c", then reset the variable cmake_option with the arg the
+# user provided in the command line. 
+while getopts "c:p:s:b:fdam" opt; do 
   case $opt in
     c) cmake_option="$OPTARG"
     ;;
@@ -42,14 +49,16 @@ while getopts "c:p:s:b:fdam" opt; do
   esac
 done
 
+# $() is notation that executes what is in the paraentheses. Here it saving the python version to pyver. 
 pyver=$(python -c "import sys; print(str(sys.version_info.major)+'.'+str(sys.version_info.minor))")
 
 echo "CMAKE_BUILD_TYPE:" $cmake_option
 echo "Python install option:" $pyInstallStyle
 echo "build_ext_list:" $build_ext_list
-export BUILD_LIST=$build_ext_list
+export BUILD_LIST=$build_ext_list # export is a command line function that sets the variable as an environment variable. 
+# an environment variable is a varaible that is accessible to subprocesses that are executed in th same shell. 
 
-if [ $force_clean == 1 ]; then
+if [ $force_clean == 1 ]; then # the -d checks whether a given path exists. This section is just deleting prior builds for fresh start
     echo "force_clean"
     if [ -d "$INSTDIR" ]; then
         rm -rf "$INSTDIR"
@@ -71,10 +80,12 @@ function cmake_build() {
     mkdir -p build
     cd build
     cmake -DCMAKE_INSTALL_PREFIX=$INSTDIR -DCMAKE_PREFIX_PATH=$CONDA_PREFIX -DCMAKE_BUILD_TYPE=$cmake_option $@ ..
-    make -j 4 install
+    make -j 4 install # make can multiprocess. "-j 4" means to set up 4 jobs. Here we are telling make to build software with up to 4 concurrent jobs. 
+    # This just means we are allowing 4 builds to operate at once.
     cd ../..
 }
 
+# This section is the equivalent of "pip install -e"
 # "python setup.py develop" seems to not create this for you
 # (although "install" does)
 mkdir -p $INSTDIR/lib/python$pyver/site-packages/
@@ -84,7 +95,7 @@ else
     pipOptions=""
 fi
 
-cmake_build xtcdata
+cmake_build xtcdata # xtcdata has no python, so we just make via cmake
 
 if [ $no_shmem == 0 ]; then
     cmake_build psalg
@@ -104,6 +115,8 @@ if [ $no_daq == 0 ]; then
     # (e.g. in xtcdata).  but in many cases it is fine without "-f" - cpo
     if [ $pyInstallStyle == "develop" ]; then
         python setup.py build_ext -f --inplace
+        #The command python setup.py build_ext -f --inplace is used in Python to build C extensions from the source files and place them in the current directory 
+        # (--inplace option) forcefully (-f option).
     fi
     pip install --no-deps --prefix=$INSTDIR $pipOptions .
     cd ..
