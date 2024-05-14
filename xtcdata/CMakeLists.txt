@@ -33,6 +33,8 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 #)
 #endif()
 
+# cmake builds the source directory; however, it will not natively build the subfolders. This command adds the subdirectory to the build process. 
+# You also need to make sure that there is a CMakeLists.txt in that subdirectory
 add_subdirectory(xtcdata)
 
 include(CMakePackageConfigHelpers)
