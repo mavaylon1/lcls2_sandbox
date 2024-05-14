@@ -1,20 +1,26 @@
-cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.10 FATAL_ERROR) # set minimum cmake
 
-project(xtcdata)
+project(xtcdata) # set the project name
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 11) # set just creates a variable
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib") # CMAKE_INSTALL_PREFIX is a cmake variable that defines the base directory where a cmake based project will be installed on the system.
+# by default it is '/usr/local' on unix systems. Here we are saying set it to /usr/local/lib
+# common locations where packages can be installed /usr/bin: Executable files || /usr/lib or /usr/lib64: Libraries || /usr/include: Header files
+# /usr/share: Shared data files
+# /usr/local/bin, /usr/local/lib, etc.: Similar to above, but for locally installed software (not managed by the package manager)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # cmake commands to possibly use in the future
 
+# skipped this 
 #file(GLOB_RECURSE
 #     ALL_CXX_SOURCE_FILES
 #     *.cc *.hh
 #)
 
+# skipped this 
 # Adding clang-format target if executable is found
 #find_program(CLANG_FORMAT "clang-format")
 #if(CLANG_FORMAT)
