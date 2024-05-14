@@ -135,8 +135,15 @@ def main(
     as_step: Annotated[
         bool, typer.Option(help="Submit DAQ processes as slurm job steps.")
     ] = False,
-    interactive: bool = False,
-    verbose: bool = False,
+    interactive: Annotated[
+        bool,
+        typer.Option(
+            help="Display results in a separate window for supported subcommands."
+        ),
+    ] = False,
+    verbose: Annotated[
+        bool, typer.Option(help="Print out sbatch script(s) submitted by psbatch.")
+    ] = False,
 ):
     global runner
     runner = Runner(cnf_file)
@@ -156,8 +163,6 @@ def main(
             show_status()
     else:
         print(f"Unrecognized subcommand: {subcommand}")
-    if interactive:
-        embed()
 
 
 def _select_config_ids(unique_ids):
@@ -170,7 +175,7 @@ def _select_config_ids(unique_ids):
 def exists(unique_ids=None):
     """Check if the config matches any existing jobs"""
     job_exists = False
-    job_details = sbman.get_job_info(noheader=True)
+    job_details = sbman.get_job_info()
 
     config_ids = _select_config_ids(unique_ids)
 
@@ -218,7 +223,7 @@ def ls():
 
 
 def show_status():
-    job_details = sbman.get_job_info(noheader=True)
+    job_details = sbman.get_job_info()
     print("%20s %12s %10s %40s" % ("Host", "UniqueID", "Status", "Command+Args"))
     for config_id, detail in runner.config.items():
         comment = sbman.get_comment(runner.xpm_id, runner.platform, config_id)
@@ -250,7 +255,7 @@ def stop(unique_ids=None):
     if runner is None:
         return
     _check_unique_ids(unique_ids)
-    job_details = sbman.get_job_info(noheader=True)
+    job_details = sbman.get_job_info()
 
     if unique_ids is not None:
         config_ids = unique_ids.split(",")
@@ -277,4 +282,4 @@ def _do_main():
 
 
 if __name__ == "__main__":
-    start()
+    _do_main()
