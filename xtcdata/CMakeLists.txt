@@ -34,10 +34,12 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 #endif()
 
 # cmake builds the source directory; however, it will not natively build the subfolders. This command adds the subdirectory to the build process. 
-# You also need to make sure that there is a CMakeLists.txt in that subdirectory
+# You also need to make sure that there is a CMakeLists.txt in that subdirectory. It can be empty or it can have more add_subdirectory calls.
 add_subdirectory(xtcdata)
 
-include(CMakePackageConfigHelpers)
+include(CMakePackageConfigHelpers) # This is includes a set of CMake functions that help package generation. 
+# CMakePackageConfigHelpers is where install and configure_package_config_file are from (and other functions). 
+# This is essentially import from python
 
 install(EXPORT xtcdataTargets
     FILE xtcdataTargets.cmake
