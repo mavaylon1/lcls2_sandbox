@@ -41,6 +41,8 @@ include(CMakePackageConfigHelpers) # This is includes a set of CMake functions t
 # CMakePackageConfigHelpers is where install and configure_package_config_file are from (and other functions). 
 # This is essentially import from python
 
+# When you run install, it creates a .cmake file. This file is typically named <exportsetname>Targets.cmake. We define the export set above with EXPORT.
+# What is an export set? It is a collection of targets that are intended to be used by other CMake projects. Other cmake projects can use "find_package" to locate and import the export set, allowing the "other project" to use the targets.
 install(EXPORT xtcdataTargets
     FILE xtcdataTargets.cmake
     NAMESPACE xtcdata::
