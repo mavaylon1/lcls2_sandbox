@@ -34,7 +34,7 @@ set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 #endif()
 
 # cmake builds the source directory; however, it will not natively build the subfolders. This command adds the subdirectory to the build process. 
-# You also need to make sure that there is a CMakeLists.txt in that subdirectory. It can be empty or it can have more add_subdirectory calls.
+# You also need to make sure that there is a CMakeLists.txt in that subdirectory. 
 add_subdirectory(xtcdata)
 
 include(CMakePackageConfigHelpers) # This is includes a set of CMake functions that help package generation. 
@@ -43,6 +43,14 @@ include(CMakePackageConfigHelpers) # This is includes a set of CMake functions t
 
 # When you run install, it creates a .cmake file. This file is typically named <exportsetname>Targets.cmake. We define the export set above with EXPORT.
 # What is an export set? It is a collection of targets that are intended to be used by other CMake projects. Other cmake projects can use "find_package" to locate and import the export set, allowing the "other project" to use the targets.
+# What are the export sets here? Well recall that we have the xtcdata subdirectory. Within there we have a a CMakeLists.txt that adds more subdirectories. In those we have two more CMakeLists.txt, one for each subdirectory. There we are calling add_library and other targets.
+# At the end of each we are adding those targets to the export set xtcdataTargets.
+# Here we are taking that export set and creating xtcdataTargets.cmake file that stores all the targets to be usable for the other project. The targets will be prefixed with the namespace and the file will be stored at the destination there.
+# Note that install is not creating the .cmake file. It is just defining the name. 
+# When we say something is installed in the context of cmake, we are copying the file from its current location to a specified directory.
+# Here we are saying to install (copy) the .cmake file into lib/cmake/xtcdata. That means when I run build and install my project, the .cmake file will be copied to that directory on the system.
+# After this installation step, the xtcdataTargets.cmake file will reside in the lib/cmake/xtcdata directory of the target system. This directory is a standard location where CMake expects to find package configuration files for projects that have been installed. 
+# Other projects that depend on xtcdata can then use find_package(xtcdata) to locate and import the xtcdataTargets export set, making the targets from xtcdata available for use in their own CMake configurations.
 install(EXPORT xtcdataTargets
     FILE xtcdataTargets.cmake
     NAMESPACE xtcdata::
